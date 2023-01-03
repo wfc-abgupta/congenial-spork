@@ -1,0 +1,146 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Feedtrail
+  description: CodeTest API Spec
+schemes:
+  - https
+host: 'localhost:8000'
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  '/api/v1/comment':
+    get:
+      tags:
+        - "api/v1"
+      summary: Return comments
+      description: Return all comments from the database
+      responses:
+        '200':
+          description: array of the comments
+          schema:
+            $ref: '#/definitions/CommentArray'
+    post:
+      tags:
+        - "api/v1"
+      summary: Create new comment
+      description: Creates new comment to database
+      parameters:
+        - name: content
+          in: body
+          required: true
+          description: The body content to create new comment
+          schema:
+            $ref: '#/definitions/CommentRequest'
+      responses:
+        '201':
+          description: Comment successfully created
+          schema:
+            $ref: '#/definitions/CommentResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/CommentBad'
+  '/api/v1/comment/{id}':
+    get:
+      tags:
+        - "api/v1"
+      summary: Return single comment
+      description: Return single comment by id
+      responses:
+        '200':
+          description: single comment
+          schema:
+            $ref: '#/definitions/CommentResponse'
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Comment ID
+    put:
+      tags:
+        - "api/v1"
+      summary: Update single comment
+      description: Update single comment by id
+      responses:
+        '200':
+          description: updated comment
+          schema:
+            $ref: '#/definitions/CommentResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/CommentBad'
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Comment ID
+        - name: content
+          in: body
+          required: true
+          description: The body content to create new comment
+          schema:
+            $ref: '#/definitions/CommentRequest'
+    delete:
+      tags:
+        - "api/v1"
+      summary: Delete single comment
+      description: Delete single comment by id
+      responses:
+        '204':
+          description: comment deleted
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Comment ID
+definitions:
+  CommentArray:
+    type: array
+    items:
+      $ref: '#/definitions/CommentResponse'
+  CommentRequest:
+    type: object
+    properties:
+      comment:
+        type: string
+        description: The content of comment
+        example: "My test comment"
+    required:
+      - comment
+  CommentResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: The ID of the comment
+        example: 1
+      comment:
+        type: string
+        description: The content of comment
+        example: "My test comment"
+      created:
+        type: string
+        description: Timestamp for comment
+        example: 2020-01-06T11:39:08.910637Z
+  CommentBad:
+    type: object
+    properties:
+      comment:
+        type: array
+        items:
+          type: string
+          description: Error text
+          example: comment is required

@@ -1,0 +1,54 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Swagger UI</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/swagger-ui.css" rel="stylesheet" type="text/css">
+  {% block extra_styles %}
+  {# -- Add any additional CSS scripts here -- #}
+  {% endblock %}
+</head>
+
+<body>
+  <div id="rest-swagger-ui"></div>
+  {% csrf_token %}
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/swagger-ui-bundle.js"></script>
+  <script>
+    window.settings = {{ drs_settings|safe }};
+    window.spec = {{ spec|safe }};
+
+    let config = Object.assign(
+      {
+        dom_id: '#rest-swagger-ui',
+        spec: window.spec,
+      },
+      window.settings
+    );
+    const csrfTokenInput = window.document.getElementsByName('csrfmiddlewaretoken');
+    // If present, set CSRF token to request headers
+    if (csrfTokenInput.length) {
+      const csrfToken = csrfTokenInput[0].value;
+      config.requestInterceptor = (req) => {
+        req.headers['X-CSRFToken'] = csrfToken;
+        if (config.acceptHeaderVersion) {
+          req.headers['accept'] += '; version=' + config.acceptHeaderVersion;
+        }
+        req.headers = Object.assign(req.headers, config.customHeaders);
+
+        return req;
+      }
+    }
+    window.swagger = SwaggerUIBundle(config)
+
+  </script>
+  {% block extra_scripts %}
+  {# -- Add any additional scripts here -- #}
+  {% endblock %}
+</body>
+
+</html>
+
